@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Notula Rapat Pro (Versi Mobile)</title>
-    <!-- Library untuk mengubah HTML ke Gambar -->
+    <title>Generator Laporan Kegiatan Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -15,12 +14,9 @@
         
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 14px; }
-        textarea { height: 90px; resize: none; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 14px; }
+        textarea { height: 80px; resize: none; }
         
-        .row { display: flex; gap: 10px; }
-        .row .form-group { flex: 1; }
-
         .btn-buat { width: 100%; padding: 15px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(26,115,232,0.2); }
         .btn-buat:active { background: #1557b0; }
 
@@ -33,22 +29,18 @@
         .btn-img { background: #188038; }
 
         /* Desain Kertas HVS */
-        #kertas-dokumen { background: white; padding: 20px 15px; border: 1px solid #ddd; border-radius: 4px; color: black; font-family: 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; }
-        .kop-surat { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 15px; }
+        #kertas-dokumen { background: white; padding: 25px 20px; border: 1px solid #ddd; border-radius: 4px; color: black; font-family: 'Times New Roman', Times, serif; font-size: 14.5px; line-height: 1.6; }
+        .kop-surat { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 20px; }
         .kop-surat h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
         
-        .detail-rapat { margin-bottom: 20px; }
-        .detail-row { display: flex; margin-bottom: 5px; }
-        .lbl { width: 120px; font-weight: bold; }
-        .titik-dua { width: 15px; }
-        .val { flex: 1; }
+        .isi-laporan { margin-bottom: 15px; }
+        .isi-row { display: flex; margin-bottom: 10px; }
+        .lbl { width: 180px; font-weight: bold; }
+        .titik-dua { width: 15px; font-weight: bold; }
+        .val { flex: 1; white-space: pre-wrap; text-align: justify; }
 
-        .isi-bagian { margin-bottom: 15px; }
-        .judul-bagian { font-weight: bold; text-decoration: underline; margin-bottom: 5px; }
-        .teks-bagian { white-space: pre-wrap; text-align: justify; }
-
-        .ttd-area { display: flex; justify-content: space-between; margin-top: 40px; text-align: center; }
-        .ttd-box { width: 45%; }
+        .ttd-area { display: flex; justify-content: flex-end; margin-top: 50px; text-align: center; }
+        .ttd-box { width: 50%; }
         .nama-ttd { font-weight: bold; text-decoration: underline; margin-top: 60px; }
 
         /* Area Hasil Render Gambar */
@@ -56,7 +48,6 @@
         #hasil-gambar-area p { color: #188038; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
         #gambar-final { max-width: 100%; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
-        /* Pengaturan Khusus Mode Print (PDF) */
         @media print {
             body * { visibility: hidden; }
             #kertas-dokumen, #kertas-dokumen * { visibility: visible; }
@@ -68,52 +59,43 @@
 <body>
 
 <div class="container">
-    <h1>📝 Pembuat Notula Rapat</h1>
-    <p class="subtitle">Khusus pengguna HP. 100% Berfungsi.</p>
+    <h1>📝 Laporan Kegiatan</h1>
+    <p class="subtitle">Format khusus dengan teks kustom.</p>
 
     <!-- Form Input Data -->
     <div class="form-group">
-        <label>Judul Rapat</label>
-        <input type="text" id="in-judul" placeholder="Contoh: Rapat Pembentukan Panitia OSIS">
-    </div>
-    <div class="row">
-        <div class="form-group">
-            <label>Tanggal</label>
-            <input type="date" id="in-tanggal">
-        </div>
-        <div class="form-group">
-            <label>Waktu</label>
-            <input type="time" id="in-waktu">
-        </div>
+        <label>Judul Dokumen</label>
+        <input type="text" id="in-judul" placeholder="Contoh: LAPORAN KEGIATAN DIVISI MULTIMEDIA" value="LAPORAN KEGIATAN DIVISI MULTIMEDIA">
     </div>
     <div class="form-group">
-        <label>Tempat Pelaksanaan</label>
-        <input type="text" id="in-tempat" placeholder="Contoh: Ruang Kelas / Zoom Meeting">
-    </div>
-    <div class="row">
-        <div class="form-group">
-            <label>Pemimpin Rapat</label>
-            <input type="text" id="in-pemimpin" placeholder="Nama Pemimpin">
-        </div>
-        <div class="form-group">
-            <label>Pembuat Notula (Notulis)</label>
-            <input type="text" id="in-notulis" placeholder="Nama Anda">
-        </div>
+        <label>Tanggal</label>
+        <input type="text" id="in-tanggal" placeholder="Contoh: 2, 3, 17 Agustus 2026">
     </div>
     <div class="form-group">
-        <label>Peserta yang Hadir</label>
-        <textarea id="in-peserta" placeholder="Tulis nama/jumlah peserta..."></textarea>
+        <label>Kegiatan Terdekat & Target</label>
+        <textarea id="in-kegiatan" placeholder="Kumpulan divisi Multimedia (Seluruh anggota Ekstrakurikuler IT)"></textarea>
     </div>
     <div class="form-group">
-        <label>Agenda Pembahasan</label>
-        <textarea id="in-agenda" placeholder="1. Pembukaan&#10;2. Inti..."></textarea>
+        <label>Surat Menyurat</label>
+        <input type="text" id="in-surat" placeholder="Contoh: Tidak ada">
     </div>
     <div class="form-group">
-        <label>Hasil & Keputusan Rapat</label>
-        <textarea id="in-hasil" style="height: 120px;" placeholder="Tuliskan jalannya rapat dan keputusan yang disepakati..."></textarea>
+        <label>Terlaksana / Tidak</label>
+        <select id="in-status">
+            <option value="Terlaksana">Terlaksana</option>
+            <option value="Tidak Terlaksana">Tidak Terlaksana</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Hambatan</label>
+        <textarea id="in-hambatan" placeholder="Contoh: Kurangnya kehadiran anggota"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Nama Pembuat Laporan</label>
+        <input type="text" id="in-notulis" placeholder="Masukkan nama Anda">
     </div>
 
-    <button class="btn-buat" onclick="prosesNotula()">📋 Buat & Tampilkan Notula</button>
+    <button class="btn-buat" onclick="prosesLaporan()">📋 Buat & Tampilkan Laporan</button>
 
     <!-- Bagian Pratinjau & Tombol Unduh -->
     <div id="preview-section">
@@ -122,51 +104,30 @@
             <button class="btn-action btn-img" onclick="buatGambar()">🖼️ Buat Gambar</button>
         </div>
 
-        <!-- Area Instruksi Gambar (Muncul saat tombol gambar diklik) -->
         <div id="hasil-gambar-area">
             <p>✅ Gambar Berhasil Dibuat!<br>Tekan dan tahan gambar di bawah ini, lalu pilih "Simpan Gambar" / "Download Image".</p>
             <img id="gambar-final" src="">
         </div>
 
-        <!-- Desain Kertas Notula Asli -->
+        <!-- Desain Kertas Laporan -->
         <div id="kertas-dokumen">
             <div class="kop-surat">
-                <h2>NOTULA RAPAT</h2>
-                <div id="out-judul" style="font-weight: bold; font-size: 16px; margin-top: 5px;">-</div>
+                <h2 id="out-judul">LAPORAN KEGIATAN</h2>
             </div>
 
-            <div class="detail-rapat">
-                <div class="detail-row"><div class="lbl">Hari / Tanggal</div><div class="titik-dua">:</div><div class="val" id="out-tanggal">-</div></div>
-                <div class="detail-row"><div class="lbl">Waktu</div><div class="titik-dua">:</div><div class="val" id="out-waktu">-</div></div>
-                <div class="detail-row"><div class="lbl">Tempat</div><div class="titik-dua">:</div><div class="val" id="out-tempat">-</div></div>
-                <div class="detail-row"><div class="lbl">Pemimpin Rapat</div><div class="titik-dua">:</div><div class="val" id="out-pemimpin">-</div></div>
-            </div>
-
-            <div class="isi-bagian">
-                <div class="judul-bagian">A. DAFTAR HADIR / PESERTA</div>
-                <div class="teks-bagian" id="out-peserta">-</div>
-            </div>
-
-            <div class="isi-bagian">
-                <div class="judul-bagian">B. AGENDA RAPAT</div>
-                <div class="teks-bagian" id="out-agenda">-</div>
-            </div>
-
-            <div class="isi-bagian">
-                <div class="judul-bagian">C. HASIL PEMBAHASAN & KEPUTUSAN</div>
-                <div class="teks-bagian" id="out-hasil">-</div>
+            <div class="isi-laporan">
+                <div class="isi-row"><div class="lbl">Tanggal</div><div class="titik-dua">:</div><div class="val" id="out-tanggal">-</div></div>
+                <div class="isi-row"><div class="lbl">Kegiatan Terdekat & Target</div><div class="titik-dua">:</div><div class="val" id="out-kegiatan">-</div></div>
+                <div class="isi-row"><div class="lbl">Surat Menyurat</div><div class="titik-dua">:</div><div class="val" id="out-surat">-</div></div>
+                <div class="isi-row"><div class="lbl">Terlaksana/Tidak</div><div class="titik-dua">:</div><div class="val" id="out-status">-</div></div>
+                <div class="isi-row"><div class="lbl">Hambatan</div><div class="titik-dua">:</div><div class="val" id="out-hambatan">-</div></div>
             </div>
 
             <div class="ttd-area">
                 <div class="ttd-box">
-                    <div>Mengetahui,</div>
-                    <div>Pemimpin Rapat</div>
-                    <div class="nama-ttd" id="out-ttd-pemimpin">Nama Pemimpin</div>
-                </div>
-                <div class="ttd-box">
                     <div>Dibuat oleh,</div>
-                    <div>Notulis</div>
-                    <div class="nama-ttd" id="out-ttd-notulis">Nama Notulis</div>
+                    <div>Pembuat Laporan</div>
+                    <div class="nama-ttd" id="out-ttd-notulis">Nama Anda</div>
                 </div>
             </div>
         </div>
@@ -174,33 +135,17 @@
 </div>
 
 <script>
-    // Fungsi mengubah format tanggal ke bahasa Indonesia
-    function formatTanggal(tglInput) {
-        if(!tglInput) return "-";
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const date = new Date(tglInput);
-        return date.toLocaleDateString('id-ID', options);
-    }
-
-    // Fungsi memindahkan data dari input ke kertas
-    function prosesNotula() {
-        document.getElementById('out-judul').innerText = document.getElementById('in-judul').value.toUpperCase() || 'RAPAT UMUM';
-        document.getElementById('out-tanggal').innerText = formatTanggal(document.getElementById('in-tanggal').value);
-        document.getElementById('out-waktu').innerText = document.getElementById('in-waktu').value ? document.getElementById('in-waktu').value + ' WIB' : '-';
-        document.getElementById('out-tempat').innerText = document.getElementById('in-tempat').value || '-';
+    function prosesLaporan() {
+        document.getElementById('out-judul').innerText = document.getElementById('in-judul').value.toUpperCase() || 'LAPORAN KEGIATAN';
+        document.getElementById('out-tanggal').innerText = document.getElementById('in-tanggal').value || '-';
+        document.getElementById('out-kegiatan').innerText = document.getElementById('in-kegiatan').value || '-';
+        document.getElementById('out-surat').innerText = document.getElementById('in-surat').value || '-';
+        document.getElementById('out-status').innerText = document.getElementById('in-status').value || '-';
+        document.getElementById('out-hambatan').innerText = document.getElementById('in-hambatan').value || '-';
         
-        const pemimpin = document.getElementById('in-pemimpin').value || '( ........................ )';
         const notulis = document.getElementById('in-notulis').value || '( ........................ )';
-        
-        document.getElementById('out-pemimpin').innerText = pemimpin;
-        document.getElementById('out-ttd-pemimpin').innerText = pemimpin;
         document.getElementById('out-ttd-notulis').innerText = notulis;
 
-        document.getElementById('out-peserta').innerText = document.getElementById('in-peserta').value || '-';
-        document.getElementById('out-agenda').innerText = document.getElementById('in-agenda').value || '-';
-        document.getElementById('out-hasil').innerText = document.getElementById('in-hasil').value || '-';
-
-        // Sembunyikan gambar sebelumnya jika ada, lalu tampilkan section pratinjau
         document.getElementById('hasil-gambar-area').style.display = 'none';
         document.getElementById('kertas-dokumen').style.display = 'block';
         
@@ -209,37 +154,23 @@
         pratinjau.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Fungsi Cetak PDF (Menggunakan Print Bawaan Browser HP)
     function cetakPDF() {
-        // Menyembunyikan gambar jika sedang terbuka, agar yang di-print murni format teks
         document.getElementById('hasil-gambar-area').style.display = 'none';
         document.getElementById('kertas-dokumen').style.display = 'block';
-        
-        // Memanggil menu Print HP (Silakan pilih "Simpan sebagai PDF" di HP)
         window.print();
     }
 
-    // Trik Khusus HP: Buat Gambar di layar agar bisa ditekan lama (Long Press)
     function buatGambar() {
         const kertas = document.getElementById('kertas-dokumen');
-        
-        // Pastikan kertas terlihat sebelum di-render
         kertas.style.display = 'block';
         
         html2canvas(kertas, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
-            
-            // Masukkan data gambar ke tag <img>
             document.getElementById('gambar-final').src = imgData;
             
-            // Tampilkan area instruksi gambar
             const areaGambar = document.getElementById('hasil-gambar-area');
             areaGambar.style.display = 'block';
-            
-            // Sembunyikan kertas aslinya agar layar tidak terlalu panjang
             kertas.style.display = 'none';
-            
-            // Scroll ke area gambar
             areaGambar.scrollIntoView({ behavior: 'smooth' });
         });
     }
