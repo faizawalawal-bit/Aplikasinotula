@@ -3,20 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Laporan Kegiatan Pro</title>
+    <title>Generator Dokumen Administrasi Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 15px; margin: 0; color: #333; }
-        .container { max-width: 100%; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; font-size: 22px; color: #1a73e8; margin-bottom: 5px; }
-        p.subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 25px; }
+        .container { max-width: 100%; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
+        /* Desain Halaman Depan (Landing Page) */
+        #halaman-depan { text-align: center; padding: 10px 0; }
+        .app-title { font-size: 22px; color: #1a73e8; margin-bottom: 5px; font-weight: bold; }
+        .app-subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
+        
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; }
+        .menu-card { 
+            background: #ffffff; 
+            border: 2px solid #e8f0fe; 
+            border-radius: 10px; 
+            padding: 20px; 
+            text-align: left; 
+            cursor: pointer; 
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .menu-card:active { background: #e8f0fe; border-color: #1a73e8; transform: scale(0.98); }
+        .menu-card-icon { font-size: 28px; margin-bottom: 8px; }
+        .menu-card-title { font-size: 16px; font-weight: bold; color: #1a73e8; margin-bottom: 5px; }
+        .menu-card-desc { font-size: 13px; color: #666; line-height: 1.4; }
+
+        /* Form Styles */
+        #halaman-form { display: none; }
+        .btn-kembali { 
+            background: #f1f3f4; 
+            color: #333; 
+            border: 1px solid #ccc; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
         input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 14px; }
         textarea { height: 80px; resize: none; }
         
+        .row { display: flex; gap: 10px; }
+        .row .form-group { flex: 1; }
+
         .btn-buat { width: 100%; padding: 15px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(26,115,232,0.2); }
         .btn-buat:active { background: #1557b0; }
 
@@ -29,21 +66,22 @@
         .btn-img { background: #188038; }
 
         /* Desain Kertas HVS */
-        #kertas-dokumen { background: white; padding: 25px 20px; border: 1px solid #ddd; border-radius: 4px; color: black; font-family: 'Times New Roman', Times, serif; font-size: 14.5px; line-height: 1.6; }
-        .kop-surat { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 20px; }
+        #kertas-dokumen { background: white; padding: 25px 20px; border: 1px solid #ddd; border-radius: 4px; color: black; font-family: 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; }
+        .kop-surat { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 15px; }
         .kop-surat h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
         
-        .isi-laporan { margin-bottom: 15px; }
-        .isi-row { display: flex; margin-bottom: 10px; }
-        .lbl { width: 180px; font-weight: bold; }
+        .isi-row { display: flex; margin-bottom: 8px; }
+        .lbl { width: 160px; font-weight: bold; }
         .titik-dua { width: 15px; font-weight: bold; }
         .val { flex: 1; white-space: pre-wrap; text-align: justify; }
 
-        .ttd-area { display: flex; justify-content: flex-end; margin-top: 50px; text-align: center; }
-        .ttd-box { width: 50%; }
-        .nama-ttd { font-weight: bold; text-decoration: underline; margin-top: 60px; }
+        .isi-bagian { margin-bottom: 12px; }
+        .judul-bagian { font-weight: bold; text-decoration: underline; margin-bottom: 4px; }
 
-        /* Area Hasil Render Gambar */
+        .ttd-area { display: flex; justify-content: space-between; margin-top: 40px; text-align: center; }
+        .ttd-box { width: 45%; }
+        .nama-ttd { font-weight: bold; text-decoration: underline; margin-top: 50px; }
+
         #hasil-gambar-area { display: none; margin-top: 20px; padding: 15px; background: #e6f4ea; border-radius: 8px; text-align: center; border: 1px solid #188038; }
         #hasil-gambar-area p { color: #188038; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
         #gambar-final { max-width: 100%; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
@@ -59,75 +97,151 @@
 <body>
 
 <div class="container">
-    <h1>📝 Laporan Kegiatan</h1>
-    <p class="subtitle">Format khusus dengan teks kustom.</p>
 
-    <!-- Form Input Data -->
-    <div class="form-group">
-        <label>Judul Dokumen</label>
-        <input type="text" id="in-judul" placeholder="Contoh: LAPORAN KEGIATAN DIVISI MULTIMEDIA" value="LAPORAN KEGIATAN DIVISI MULTIMEDIA">
-    </div>
-    <div class="form-group">
-        <label>Tanggal</label>
-        <input type="text" id="in-tanggal" placeholder="Contoh: 2, 3, 17 Agustus 2026">
-    </div>
-    <div class="form-group">
-        <label>Kegiatan Terdekat & Target</label>
-        <textarea id="in-kegiatan" placeholder="Kumpulan divisi Multimedia (Seluruh anggota Ekstrakurikuler IT)"></textarea>
-    </div>
-    <div class="form-group">
-        <label>Surat Menyurat</label>
-        <input type="text" id="in-surat" placeholder="Contoh: Tidak ada">
-    </div>
-    <div class="form-group">
-        <label>Terlaksana / Tidak</label>
-        <select id="in-status">
-            <option value="Terlaksana">Terlaksana</option>
-            <option value="Tidak Terlaksana">Tidak Terlaksana</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Hambatan</label>
-        <textarea id="in-hambatan" placeholder="Contoh: Kurangnya kehadiran anggota"></textarea>
-    </div>
-    <div class="form-group">
-        <label>Nama Pembuat Laporan</label>
-        <input type="text" id="in-notulis" placeholder="Masukkan nama Anda">
-    </div>
+    <!-- HALAMAN DEPAN (MENU UTAMA) -->
+    <div id="halaman-depan">
+        <div class="app-title">📱 Pembuat Dokumen Administrasi</div>
+        <div class="app-subtitle">Pilih jenis dokumen yang ingin Anda buat:</div>
 
-    <button class="btn-buat" onclick="prosesLaporan()">📋 Buat & Tampilkan Laporan</button>
-
-    <!-- Bagian Pratinjau & Tombol Unduh -->
-    <div id="preview-section">
-        <div class="btn-group">
-            <button class="btn-action btn-pdf" onclick="cetakPDF()">📥 Simpan sbg PDF</button>
-            <button class="btn-action btn-img" onclick="buatGambar()">🖼️ Buat Gambar</button>
-        </div>
-
-        <div id="hasil-gambar-area">
-            <p>✅ Gambar Berhasil Dibuat!<br>Tekan dan tahan gambar di bawah ini, lalu pilih "Simpan Gambar" / "Download Image".</p>
-            <img id="gambar-final" src="">
-        </div>
-
-        <!-- Desain Kertas Laporan -->
-        <div id="kertas-dokumen">
-            <div class="kop-surat">
-                <h2 id="out-judul">LAPORAN KEGIATAN</h2>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="bukaForm('notula')">
+                <div class="menu-card-icon">📌</div>
+                <div class="menu-card-title">Notula Rapat Umum / OSIS</div>
+                <div class="menu-card-desc">Format resmi catatan hasil rapat, daftar hadir peserta, agenda, dan tanda tangan notulis.</div>
             </div>
 
-            <div class="isi-laporan">
-                <div class="isi-row"><div class="lbl">Tanggal</div><div class="titik-dua">:</div><div class="val" id="out-tanggal">-</div></div>
-                <div class="isi-row"><div class="lbl">Kegiatan Terdekat & Target</div><div class="titik-dua">:</div><div class="val" id="out-kegiatan">-</div></div>
-                <div class="isi-row"><div class="lbl">Surat Menyurat</div><div class="titik-dua">:</div><div class="val" id="out-surat">-</div></div>
-                <div class="isi-row"><div class="lbl">Terlaksana/Tidak</div><div class="titik-dua">:</div><div class="val" id="out-status">-</div></div>
-                <div class="isi-row"><div class="lbl">Hambatan</div><div class="titik-dua">:</div><div class="val" id="out-hambatan">-</div></div>
+            <div class="menu-card" onclick="bukaForm('laporan')">
+                <div class="menu-card-icon">📊</div>
+                <div class="menu-card-title">Laporan Kegiatan Divisi / Ekskul</div>
+                <div class="menu-card-desc">Format rekap kegiatan terdekat, status keterlaksanaan, surat menyurat, dan catatan hambatan.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN FORMULIR INPUT -->
+    <div id="halaman-form">
+        <button class="btn-kembali" onclick="kembaliKeDepan()">⬅️ Kembali ke Menu Utama</button>
+
+        <div class="form-group">
+            <label>Judul Dokumen</label>
+            <input type="text" id="in-judul" placeholder="Masukkan judul dokumen">
+        </div>
+
+        <div class="form-group">
+            <label>Hari / Tanggal</label>
+            <input type="text" id="in-tanggal" placeholder="Contoh: Senin, 17 Agustus 2026 atau 2, 3, 17 Agustus 2026">
+        </div>
+
+        <!-- Inputs Khusus Notula -->
+        <div id="form-notula">
+            <div class="row">
+                <div class="form-group">
+                    <label>Waktu</label>
+                    <input type="text" id="in-waktu" placeholder="09.00 - Selesai">
+                </div>
+                <div class="form-group">
+                    <label>Tempat</label>
+                    <input type="text" id="in-tempat" placeholder="Ruang Rapat / Zoom">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Pemimpin Rapat</label>
+                    <input type="text" id="in-pemimpin" placeholder="Nama Pemimpin">
+                </div>
+                <div class="form-group">
+                    <label>Notulis</label>
+                    <input type="text" id="in-notulis" placeholder="Nama Notulis">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Peserta Hadir</label>
+                <textarea id="in-peserta" placeholder="Daftar peserta..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Agenda</label>
+                <textarea id="in-agenda" placeholder="Agenda pembahasan..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Hasil Pembahasan</label>
+                <textarea id="in-hasil" style="height: 100px;" placeholder="Keputusan rapat..."></textarea>
+            </div>
+        </div>
+
+        <!-- Inputs Khusus Laporan -->
+        <div id="form-laporan" style="display: none;">
+            <div class="form-group">
+                <label>Kegiatan Terdekat & Target</label>
+                <textarea id="in-kegiatan" placeholder="Kumpulan divisi Multimedia (Seluruh anggota IT)"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Surat Menyurat</label>
+                <input type="text" id="in-surat" placeholder="Contoh: Tidak ada">
+            </div>
+            <div class="form-group">
+                <label>Terlaksana / Tidak</label>
+                <select id="in-status">
+                    <option value="Terlaksana">Terlaksana</option>
+                    <option value="Tidak Terlaksana">Tidak Terlaksana</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Hambatan</label>
+                <textarea id="in-hambatan" placeholder="Contoh: Kurangnya kehadiran anggota"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Pembuat Laporan</label>
+                <input type="text" id="in-pembuat" placeholder="Nama Pembuat Laporan">
+            </div>
+        </div>
+
+        <button class="btn-buat" onclick="prosesDokumen()">📋 Buat & Tampilkan Dokumen</button>
+
+        <!-- Pratinjau Kertas -->
+        <div id="preview-section">
+            <div class="btn-group">
+                <button class="btn-action btn-pdf" onclick="cetakPDF()">📥 Simpan sbg PDF</button>
+                <button class="btn-action btn-img" onclick="buatGambar()">🖼️ Buat Gambar</button>
             </div>
 
-            <div class="ttd-area">
-                <div class="ttd-box">
-                    <div>Dibuat oleh,</div>
-                    <div>Pembuat Laporan</div>
-                    <div class="nama-ttd" id="out-ttd-notulis">Nama Anda</div>
+            <div id="hasil-gambar-area">
+                <p>✅ Gambar Berhasil Dibuat!<br>Tekan lama gambar di bawah ini, lalu pilih "Simpan Gambar".</p>
+                <img id="gambar-final" src="">
+            </div>
+
+            <div id="kertas-dokumen">
+                <div class="kop-surat">
+                    <h2 id="out-judul">DOCUMENT</h2>
+                </div>
+
+                <!-- Tampilan Kertas Notula -->
+                <div id="kertas-notula">
+                    <div class="isi-row"><div class="lbl">Hari / Tanggal</div><div class="titik-dua">:</div><div class="val" id="out-tanggal">-</div></div>
+                    <div class="isi-row"><div class="lbl">Waktu</div><div class="titik-dua">:</div><div class="val" id="out-waktu">-</div></div>
+                    <div class="isi-row"><div class="lbl">Tempat</div><div class="titik-dua">:</div><div class="val" id="out-tempat">-</div></div>
+                    <div class="isi-row"><div class="lbl">Pemimpin Rapat</div><div class="titik-dua">:</div><div class="val" id="out-pemimpin">-</div></div>
+                    <br>
+                    <div class="isi-bagian"><div class="judul-bagian">A. DAFTAR HADIR</div><div class="val" id="out-peserta">-</div></div>
+                    <div class="isi-bagian"><div class="judul-bagian">B. AGENDA RAPAT</div><div class="val" id="out-agenda">-</div></div>
+                    <div class="isi-bagian"><div class="judul-bagian">C. HASIL PEMBAHASAN</div><div class="val" id="out-hasil">-</div></div>
+                    
+                    <div class="ttd-area">
+                        <div class="ttd-box"><div>Mengetahui,</div><div>Pemimpin Rapat</div><div class="nama-ttd" id="out-ttd-pemimpin">-</div></div>
+                        <div class="ttd-box"><div>Dibuat oleh,</div><div>Notulis</div><div class="nama-ttd" id="out-ttd-notulis">-</div></div>
+                    </div>
+                </div>
+
+                <!-- Tampilan Kertas Laporan -->
+                <div id="kertas-laporan" style="display: none;">
+                    <div class="isi-row"><div class="lbl">Tanggal</div><div class="titik-dua">:</div><div class="val" id="out-laporan-tanggal">-</div></div>
+                    <div class="isi-row"><div class="lbl">Kegiatan Terdekat & Target</div><div class="titik-dua">:</div><div class="val" id="out-kegiatan">-</div></div>
+                    <div class="isi-row"><div class="lbl">Surat Menyurat</div><div class="titik-dua">:</div><div class="val" id="out-surat">-</div></div>
+                    <div class="isi-row"><div class="lbl">Terlaksana/Tidak</div><div class="titik-dua">:</div><div class="val" id="out-status">-</div></div>
+                    <div class="isi-row"><div class="lbl">Hambatan</div><div class="titik-dua">:</div><div class="val" id="out-hambatan">-</div></div>
+                    
+                    <div class="ttd-area" style="justify-content: flex-end;">
+                        <div class="ttd-box"><div>Dibuat oleh,</div><div>Pembuat Laporan</div><div class="nama-ttd" id="out-ttd-pembuat">-</div></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,16 +249,59 @@
 </div>
 
 <script>
-    function prosesLaporan() {
-        document.getElementById('out-judul').innerText = document.getElementById('in-judul').value.toUpperCase() || 'LAPORAN KEGIATAN';
-        document.getElementById('out-tanggal').innerText = document.getElementById('in-tanggal').value || '-';
-        document.getElementById('out-kegiatan').innerText = document.getElementById('in-kegiatan').value || '-';
-        document.getElementById('out-surat').innerText = document.getElementById('in-surat').value || '-';
-        document.getElementById('out-status').innerText = document.getElementById('in-status').value || '-';
-        document.getElementById('out-hambatan').innerText = document.getElementById('in-hambatan').value || '-';
-        
-        const notulis = document.getElementById('in-notulis').value || '( ........................ )';
-        document.getElementById('out-ttd-notulis').innerText = notulis;
+    let modeAktif = 'notula';
+
+    function bukaForm(jenis) {
+        modeAktif = jenis;
+        document.getElementById('halaman-depan').style.display = 'none';
+        document.getElementById('halaman-form').style.display = 'block';
+        document.getElementById('preview-section').style.display = 'none';
+
+        if(jenis === 'notula') {
+            document.getElementById('form-notula').style.display = 'block';
+            document.getElementById('form-laporan').style.display = 'none';
+            document.getElementById('in-judul').value = "NOTULA RAPAT";
+        } else {
+            document.getElementById('form-notula').style.display = 'none';
+            document.getElementById('form-laporan').style.display = 'block';
+            document.getElementById('in-judul').value = "LAPORAN KEGIATAN DIVISI MULTIMEDIA";
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function kembaliKeDepan() {
+        document.getElementById('halaman-form').style.display = 'none';
+        document.getElementById('halaman-depan').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function prosesDokumen() {
+        document.getElementById('out-judul').innerText = document.getElementById('in-judul').value.toUpperCase() || 'DOKUMEN';
+
+        if(modeAktif === 'notula') {
+            document.getElementById('kertas-notula').style.display = 'block';
+            document.getElementById('kertas-laporan').style.display = 'none';
+
+            document.getElementById('out-tanggal').innerText = document.getElementById('in-tanggal').value || '-';
+            document.getElementById('out-waktu').innerText = document.getElementById('in-waktu').value || '-';
+            document.getElementById('out-tempat').innerText = document.getElementById('in-tempat').value || '-';
+            document.getElementById('out-pemimpin').innerText = document.getElementById('in-pemimpin').value || '-';
+            document.getElementById('out-peserta').innerText = document.getElementById('in-peserta').value || '-';
+            document.getElementById('out-agenda').innerText = document.getElementById('in-agenda').value || '-';
+            document.getElementById('out-hasil').innerText = document.getElementById('in-hasil').value || '-';
+            document.getElementById('out-ttd-pemimpin').innerText = document.getElementById('in-pemimpin').value || '( ........................ )';
+            document.getElementById('out-ttd-notulis').innerText = document.getElementById('in-notulis').value || '( ........................ )';
+        } else {
+            document.getElementById('kertas-notula').style.display = 'none';
+            document.getElementById('kertas-laporan').style.display = 'block';
+
+            document.getElementById('out-laporan-tanggal').innerText = document.getElementById('in-tanggal').value || '-';
+            document.getElementById('out-kegiatan').innerText = document.getElementById('in-kegiatan').value || '-';
+            document.getElementById('out-surat').innerText = document.getElementById('in-surat').value || '-';
+            document.getElementById('out-status').innerText = document.getElementById('in-status').value || '-';
+            document.getElementById('out-hambatan').innerText = document.getElementById('in-hambatan').value || '-';
+            document.getElementById('out-ttd-pembuat').innerText = document.getElementById('in-pembuat').value || '( ........................ )';
+        }
 
         document.getElementById('hasil-gambar-area').style.display = 'none';
         document.getElementById('kertas-dokumen').style.display = 'block';
